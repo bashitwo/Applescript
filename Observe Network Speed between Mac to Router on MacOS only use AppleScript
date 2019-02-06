@@ -11,7 +11,7 @@ set RouterAddress to word 1 of result
 do shell script "ping -c " & c & " " & RouterAddress
 set Ping to result
 set nw to number of words of Ping
-set ave to text from word (nw - 3) to word (nw - 3) of Ping --average response speed in c times.
+set ave to text from word (nw - 3) to word (nw - 3) of Ping --average response speed in c times.--not beatiful
 set Ns to round (56 / (ave * 0.1)) --transrate [ms] to [mbps].the ping sends 56 byte on my PC.
 
 set logText to read (currentPath & logFileName)
