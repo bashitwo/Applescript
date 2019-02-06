@@ -1,0 +1,37 @@
+set c to 2 --number of Ping signal in a process. 1 Ping spend about 1 second.
+set N to 5 --number of date in logfile.
+tell application "Finder"
+	set currentPath to POSIX path of (parent of (path to me) as text)
+end tell
+set logFileName to "test.txt" --file name of logfile. it neccesary put in the same directory as this script. 
+
+do shell script "arp -a -n" --check the IP address
+set RouterAddress to word 1 of result
+
+do shell script "ping -c " & c & " " & RouterAddress
+set Ping to result
+set nw to number of words of Ping
+set ave to text from word (nw - 3) to word (nw - 3) of Ping --average response speed in c times.
+set Ns to round (56 / (ave * 0.1)) --transrate [ms] to [mbps].the ping sends 56 byte on my PC.
+
+set logText to read (currentPath & logFileName)
+set nwlog to number of words of logText
+if {nwlog ≥ N} then
+	set theText to (Ns as text) & return & text from word 1 to word (N - 1) of logText
+	set ct to count words of theText
+else
+	set theText to (Ns as text) & return & logText
+	set ct to count words of theText
+end if
+
+tell application "System Events"
+	do shell script "echo " & quoted form of theText & "	" & " > " & (currentPath & logFileName)
+end tell
+
+set ans to 0
+repeat with i from 1 to N
+	set ans to ans + (word i of theText)
+end repeat
+set ans to ans / N
+
+return ans
