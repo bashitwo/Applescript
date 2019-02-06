@@ -1,2 +1,3 @@
 # Applescript
-operate GeekTool．iTunes, Ping, Todo
+for GeekTool．
+Operate iTunes, Network.
