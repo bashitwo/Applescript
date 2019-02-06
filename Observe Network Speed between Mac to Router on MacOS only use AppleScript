@@ -34,4 +34,32 @@ repeat with i from 1 to N
 end repeat
 set ans to ans / N
 
-return ans
+set xbar to 0
+repeat with i from 1 to N
+	set xbar to xbar + i
+end repeat
+set xbar to (xbar / N)
+
+set sxy to 0
+set sx to 0
+repeat with i from 1 to N
+	set sxy to sxy + (i - xbar) * ((word i of theText) - ans)
+	set sx to sx + (i - xbar) ^ 2
+end repeat
+set a to (sxy / sx) as text
+
+set incline to ""
+if {a ≥ 30} then
+	set incline to "↑"
+else if {a ≥ 10 and a < 30} then
+	set incline to "↗︎"
+else if {a ≥ -10 and a < 10} then
+	set incline to "→"
+else if {a ≥ -30 and a < -10} then
+	set incline to "↘︎"
+else if {a < 30} then
+	set incline to "↓"
+end if
+
+
+return (incline & return & ans & " Mbps") as text
