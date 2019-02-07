@@ -1,45 +1,35 @@
-set alist to {{1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}}
-set prov to {1, 2}
-set res to ""
---set a to ((year of (current date) as integer) & (month of (current date) as integer) & (day of (current date)) & ((time string of (current date)))) as string
-set a to ((year of (current date) as integer) & "/" & (month of (current date) as integer) & "/" & (day of (current date)) & "/" & ((time string of (current date)))) as string
-tell application "iTunes"
-	
-	repeat with i from 1 to 25
-		set thetrack to track i of playlist "トップ 25"
-		set notr to name of thetrack
-		set pcotr to played count of thetrack
-		
-		set item 1 of item i of alist to notr
-		set item 2 of item i of alist to pcotr
-		
-		--log prov
-	end repeat
-	
-	repeat with j from 1 to 25
-		set res to item 2 of item j of alist
-		set fileN to item 1 of item j of alist
-		try
-			set theText to read "/Users/" & "YourAcount" & "/Library/Scripts/countiTunes/log/" & fileN as string
-		on error
-			set theText to ""
-		end try
-		tell application "System Events"
-			set fileDate to modification date of alias (":Users:tsubasa0mac:Library:Scripts:countiTunes:log:" & "theMostPlayedTrack")
-			if (((current date) - fileDate) > 86400) then
-				do shell script "echo " & quoted form of theText & a & "	" & res & " > /Users/" & "YourAcount" & "/Library/Scripts/countiTunes/log/" & quoted form of item 1 of item j of alist
-			end if
-		end tell
-		
-	end repeat
-	
-	repeat with j from 1 to 25
-		--set res to res & item 1 of item j of alist & return
-	end repeat
-	
-	--return name of track 2 of playlist "トップ 25"
+set trackList to {}
+set saveDate to ((year of (current date) as integer) & "/" & (month of (current date) as integer) & "/" & (day of (current date)) & "/" & ((time string of (current date)))) as string
+tell application "Finder"
+	set currentPath to POSIX path of (parent of (path to me) as text)
 end tell
 
-return alist
+tell application "iTunes"
+	set tmptc to 0
+	repeat with i from 1 to 25
+		set temp to {}
+		set end of temp to name of track i of playlist "トップ 25"
+		set end of temp to played count of track i of playlist "トップ 25"
+		set end of trackList to temp
+		
+		if ((item 2 of temp) > tmptc) then
+			set tmptc to item 2 of temp
+			set theMostPlayedTrack to item 1 of temp
+		end if
+	end repeat
+end tell
 
-
+tell application "System Events"
+	if (((current date) - (modification date of alias (POSIX file (currentPath & theMostPlayedTrack & ".txt") as text))) > 86400) then
+		repeat with i from 1 to 25
+			try
+				set fileText to read ((currentPath & item 1 of item i of trackList) & ".txt")
+			on error
+				set fileText to ""
+			end try
+			
+			do shell script "echo " & quoted form of (saveDate & " " & item 2 of item i of trackList & return & fileText) & "	" & " > " & quoted form of ((currentPath & item 1 of item i of trackList) & ".txt")
+			log currentPath & item 1 of item i of trackList & ".txt"
+		end repeat
+	end if
+end tell
