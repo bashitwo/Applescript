@@ -1,5 +1,5 @@
 set c to 2 --number of Ping signal in a process. 1 Ping spend about 1 second.
-set N to 5 --number of date in logfile.
+set N to 6 --number of date in logfile.
 tell application "Finder"
 	set currentPath to POSIX path of (parent of (path to me) as text)
 end tell
@@ -8,11 +8,11 @@ set logFileName to "test.txt" --file name of logfile. it neccesary put in the sa
 do shell script "arp -a -n" --check the IP address
 set RouterAddress to word 1 of result
 
-do shell script "ping -c " & c & " " & RouterAddress
+do shell script "ping -c " & c & " google.com"
 set Ping to result
 set nw to number of words of Ping
-set ave to text from word (nw - 3) to word (nw - 3) of Ping --average response speed in c times.--not beatiful
-set Ns to round (56 / (ave * 0.1)) --transrate [ms] to [mbps].the ping sends 56 byte on my PC.
+set ave to word (nw - 3) of Ping ----average response speed in c times.
+set Ns to 56 / (ave * 0.1) --transrate [ms] to [mbps].the ping sends 56 byte on my PC.
 
 set logText to read (currentPath & logFileName)
 set nwlog to number of words of logText
@@ -32,7 +32,7 @@ set ans to 0
 repeat with i from 1 to N
 	set ans to ans + (word i of theText)
 end repeat
-set ans to ans / N
+set ans to (round (10 * ans / N)) / 10
 
 set xbar to 0
 repeat with i from 1 to N
@@ -50,7 +50,7 @@ set a to (sxy / sx) as text
 
 set incline to ""
 if {a ≥ 30} then
-	set incline to "↑"
+	set incline to "↑ "
 else if {a ≥ 10 and a < 30} then
 	set incline to "↗︎"
 else if {a ≥ -10 and a < 10} then
@@ -58,8 +58,9 @@ else if {a ≥ -10 and a < 10} then
 else if {a ≥ -30 and a < -10} then
 	set incline to "↘︎"
 else if {a < 30} then
-	set incline to "↓"
+	set incline to "↓ "
 end if
 
 
-return (incline & return & ans & " Mbps") as text
+return (incline & ans & " Mbps") as text
+
