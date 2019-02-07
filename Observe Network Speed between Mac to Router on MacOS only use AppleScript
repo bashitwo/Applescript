@@ -64,3 +64,4 @@ end if
 
 return (incline & ans & " Mbps") as text
 
+--バージョン2.10 (194), AppleScript 2.7, MacOS 10.13.6
