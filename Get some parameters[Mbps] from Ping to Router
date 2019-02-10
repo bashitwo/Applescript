@@ -1,11 +1,28 @@
 set theList to {}
+set sx to 0
 
 do shell script "arp -a -n"
-set RouterAddress to word 1 of result
+set reList to every word of result
+set RouterAddress to item 1 of reList
+--display dialog reList
 set c to 5
 set ps to 5000
 do shell script "ping -s " & ps & " -c " & c & " " & RouterAddress
 set thePing to result
+set r to {}
+--display dialog thePing as text
+set sum to 0
+try
+	repeat with i from 1 to c
+		set end of r to word 13 of item (i + 1) of every paragraph of thePing
+		set item i of r to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (item i of r))))) / 1000
+		set sum to sum + (item i of r)
+	end repeat
+	repeat with i from 1 to c
+		set sx to sx + (((item i of r) - (sum / c)) ^ 2) ^ 0.5
+	end repeat
+	set sx to sx / c
+end try
 
 set nw to number of words of thePing
 set min to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 4) of thePing))))) / 1000
@@ -14,6 +31,6 @@ set max to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 2) of thePin
 set stdev to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 1) of thePing))))) / 1000
 
 --return "min/ave/max/stdif = " & lc & return & return & thePing & return & nw
-return (ave & return & min & return & max & return & stdev) as text
+return (ave & return & min & return & max & return & sx) as text
 --return RouterAddress
 --100 86 72 58 44
