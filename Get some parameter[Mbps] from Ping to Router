@@ -1,0 +1,19 @@
+set theList to {}
+
+do shell script "arp -a -n"
+set RouterAddress to word 1 of result
+set c to 5
+set ps to 5000
+do shell script "ping -s " & ps & " -c " & c & " " & RouterAddress
+set thePing to result
+
+set nw to number of words of thePing
+set min to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 4) of thePing))))) / 1000
+set ave to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 3) of thePing))))) / 1000
+set max to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 2) of thePing))))) / 1000
+set stdev to (round ((2 * ps * 1000 / (1000000 * 1.0E-3 * (word (nw - 1) of thePing))))) / 1000
+
+--return "min/ave/max/stdif = " & lc & return & return & thePing & return & nw
+return (ave & return & min & return & max & return & stdev) as text
+--return RouterAddress
+--100 86 72 58 44
